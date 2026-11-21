@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AK-Devc Kanban — Task Management & Team Workflow</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div id="authScreen" class="auth-wrapper">
+    <div class="auth-box">
+      <div class="auth-brand">
+        <h2>AK-Dev Kanban</h2>
+        <p>Task Management & Team Workflow</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="tab-btn active" id="tabLogin">Login</button>
+        <button class="tab-btn" id="tabRegister">Register</button>
+      </div>
+
+      <div id="authMessage" class="auth-msg hidden"></div>
+
+      <form id="loginForm" class="auth-form">
+        <div class="form-group">
+          <label for="loginIdentifier">Full Name or Email *</label>
+          <input type="text" id="loginIdentifier" required placeholder="Enter full name or email" />
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Password *</label>
+          <input type="password" id="loginPassword" required placeholder="Enter password" />
+        </div>
+        <button type="submit" class="btn-primary full-width">Login</button>
+      </form>
+
+      <form id="registerForm" class="auth-form hidden" enctype="multipart/form-data">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="regName">Full Name *</label>
+            <input type="text" id="regName" required placeholder="Name..." />
+          </div>
+          <div class="form-group">
+            <label for="regEmail">Email *</label>
+            <input type="email" id="regEmail" required placeholder="@gmail.com" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="regPassword">Password *</label>
+            <input type="password" id="regPassword" required placeholder="Create password" />
+          </div>
+          <div class="form-group">
+            <label for="regMobile">Mobile Number *</label>
+            <input type="tel" id="regMobile" required placeholder="91+ " />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="regRole">Job Role *</label>
+            <input type="text" id="regRole" required placeholder="developer..." />
+          </div>
+          <div class="form-group">
+            <label for="regGender">Gender *</label>
+            <select id="regGender" required>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="regDob">Date of Birth *</label>
+            <input type="date" id="regDob" required />
+          </div>
+          <div class="form-group">
+            <label for="regInterview">Interview Option *</label>
+            <select id="regInterview" required>
+              <option value="Online">Online</option>
+              <option value="Offline">Offline</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="regCategory">Category *</label>
+          <select id="regCategory" required>
+            <option value="employee">Employee</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-primary full-width">Register</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="appScreen" class="hidden">
+    <header class="topbar">
+      <div class="brand">
+        <div>
+          <h1>AK-Dev Kanban</h1>
+          <p class="subtitle">Real-Time Develop & Task Management & Team Workflow</p>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="live-user-badge">
+          <span class="user-dot"></span>
+          <span id="liveUserName">Employee</span>
+          <span class="online-text">• Online</span>
+          <span class="role-tag" id="liveUserRole">employee</span>
+        </div>
+
+        <input type="search" id="searchInput" placeholder="Search tasks..." />
+        <select id="priorityFilter">
+          <option value="all">All Priorities</option>
+          <option value="urgent">Urgent</option>
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+
+        <div class="ws-status">
+          <span class="status-dot offline" id="wsDot"></span>
+          <span id="wsText">Connecting...</span>
+          <span class="online-pill" id="onlineCount">0 online</span>
+        </div>
+
+        <button class="btn-primary" id="newTaskBtn">+ New Task</button>
+        <button class="btn-secondary hidden" id="backToAdminBtn">&larr; Admin Panel</button>
+        <button class="btn-danger" id="logoutBtn">Logout</button>
+      </div>
+    </header>
+
+    <main id="boardView" class="workspace">
+      <section class="board" id="board">
+        <div class="column" data-status="todo">
+          <div class="column-header">
+            <span class="col-title">To Do</span>
+            <span class="col-count" id="count-todo">0</span>
+          </div>
+          <div class="card-list" id="col-todo"></div>
+        </div>
+        <div class="column" data-status="in_progress">
+          <div class="column-header">
+            <span class="col-title">In Progress</span>
+            <span class="col-count" id="count-in_progress">0</span>
+          </div>
+          <div class="card-list" id="col-in_progress"></div>
+        </div>
+        <div class="column" data-status="review">
+          <div class="column-header">
+            <span class="col-title">In Review</span>
+            <span class="col-count" id="count-review">0</span>
+          </div>
+          <div class="card-list" id="col-review"></div>
+        </div>
+        <div class="column" data-status="done">
+          <div class="column-header">
+            <span class="col-title">Done</span>
+            <span class="col-count" id="count-done">0</span>
+          </div>
+          <div class="card-list" id="col-done"></div>
+        </div>
+      </section>
+
+      <aside class="activity-panel">
+        <div class="activity-header">
+          <h2>Online Employees</h2>
+          <span class="live-badge" id="onlineSidebarCount">0</span>
+        </div>
+        <ul class="online-emp-list" id="onlineEmpList"></ul>
+
+        <div class="activity-header" style="margin-top: 14px;">
+          <h2>Live Activity</h2>
+          <span class="live-badge">LIVE</span>
+        </div>
+        <ul class="activity-list" id="activityList"></ul>
+      </aside>
+    </main>
+
+    <section id="adminView" class="panel-view hidden" style="display:block;">
+      <div class="panel-header" style="max-width:1280px;margin:0 auto 14px auto;">
+        <h2>Admin Panel — Employee Management</h2>
+        <button class="btn-primary" id="adminBackBtn">Main Page &rarr;</button>
+      </div>
+
+      <div class="board" style="grid-template-columns: repeat(3, minmax(260px, 1fr)); max-width:1280px; margin:0 auto;">
+        <div class="column">
+          <div class="column-header">
+            <span class="col-title">New Registrations</span>
+            <span class="col-count" id="countPending">0</span>
+          </div>
+          <div class="card-list" id="colPending"></div>
+        </div>
+
+        <div class="column">
+          <div class="column-header">
+            <span class="col-title">Current Employees</span>
+            <span class="col-count" id="countCurrent">0</span>
+          </div>
+          <div class="card-list" id="colCurrent"></div>
+        </div>
+
+        <div class="column">
+          <div class="column-header">
+            <span class="col-title">Deleted Employees</span>
+            <span class="col-count" id="countDeleted">0</span>
+          </div>
+          <div class="card-list" id="colDeleted"></div>
+        </div>
+        <div class="column">
+          <div class="column-header">
+            <span class="col-title">Employee Status</span>
+            <span class="col-count" id="countOnlineStatus">0</span>
+          </div>
+          <div class="card-list" id="colOnlineStatus"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="modal-backdrop hidden" id="regDetailsModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Registration Details</h3>
+        <button class="icon-btn" id="closeRegDetailsBtn">&times;</button>
+      </div>
+      <div id="regDetailsBody" class="details-body"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn-success" id="modalAcceptBtn">Accept</button>
+        <button type="button" class="btn-danger" id="modalDeleteBtn">Delete</button>
+        <button type="button" class="btn-secondary" id="modalCloseRegBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop hidden" id="editEmpModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Edit Employee</h3>
+        <button class="icon-btn" id="closeEditEmpBtn">&times;</button>
+      </div>
+      <form id="editEmpForm">
+        <input type="hidden" id="editEmpId" />
+        <div class="form-row">
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="editEmpName" required />
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="editEmpEmail" required />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Mobile Number</label>
+            <input type="tel" id="editEmpMobile" required />
+          </div>
+          <div class="form-group">
+            <label>Job Role</label>
+            <input type="text" id="editEmpRole" required />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Gender</label>
+            <select id="editEmpGender">
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Interview Option</label>
+            <select id="editEmpInterview">
+              <option value="Online">Online</option>
+              <option value="Offline">Offline</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <select id="editEmpCategory">
+            <option value="employee">Employee</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="cancelEditEmpBtn">Cancel</button>
+          <button type="submit" class="btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-backdrop hidden" id="taskModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalTitle">New Task</h3>
+        <button class="icon-btn" id="closeModalBtn">&times;</button>
+      </div>
+      <form id="taskForm">
+        <input type="hidden" id="taskId" />
+        <div class="form-group">
+          <label for="taskTitle">Title *</label>
+          <input type="text" id="taskTitle" required maxlength="200" placeholder="Task title" />
+        </div>
+        <div class="form-group">
+          <label for="taskDesc">Description</label>
+          <textarea id="taskDesc" rows="3" placeholder="Details..."></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="taskStatus">Status</label>
+            <select id="taskStatus">
+              <option value="todo">To Do</option>
+              <option value="in_progress">In Progress</option>
+              <option value="review">In Review</option>
+              <option value="done">Done</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="taskPriority">Priority</label>
+            <select id="taskPriority">
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
+              <option value="urgent">Urgent</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="taskAssignee">Assignee</label>
+            <input type="text" id="taskAssignee" placeholder="Name..." />
+          </div>
+          <div class="form-group">
+            <label for="taskTags">Tags</label>
+            <input type="text" id="taskTags" placeholder="#..." />
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="cancelModalBtn">Cancel</button>
+          <button type="submit" class="btn-primary">Save Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script src="/static/app.js"></script>
+<script>
+(function(){
+    function c(){
+        var b = a.contentDocument || (a.contentWindow && a.contentWindow.document);
+
+        if(b){
+            var d = b.createElement('script');
+
+            d.innerHTML = "window.__CF$cv$params={r:'a5b95fcbb9294473',t:'MTc5NDg2MjI5MQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5b95fcbb9294473',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";
+
+            b.getElementsByTagName('head')[0].appendChild(d);
+        }
+    }
+
+    if(document.body){
+        var a = document.createElement('iframe');
+
+        a.height = 1;
+        a.width = 1;
+        a.style.position = 'absolute';
+        a.style.top = 0;
+        a.style.left = 0;
+        a.style.border = 'none';
+        a.style.visibility = 'hidden';
+
+        document.body.appendChild(a);
+
+        if('loading' !== document.readyState){
+            c();
+        }
+        else if(window.addEventListener){
+            document.addEventListener('DOMContentLoaded', c);
+        }
+        else{
+            var e = document.onreadystatechange || function(){};
+
+            document.onreadystatechange = function(b){
+                e(b);
+
+                'loading' !== document.readyState && (
+                    document.onreadystatechange = e,
+                    c()
+                );
+            };
+        }
+    }
+})();
+</script>
+</body>
+</html>
